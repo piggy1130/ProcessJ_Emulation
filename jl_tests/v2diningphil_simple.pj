@@ -1,0 +1,97 @@
+import std.*;
+
+void philosopher(int id, chan<boolean>.write left, chan<boolean>.write right) {
+    int random_num;
+    chan<boolean> fake;
+    boolean any;
+    while (true) {
+        println(id + ": I am thinking");
+        random_num = getRandomNumber(1, 10); 
+        //println(id + ": random number is: " + random_num + "  thinking");
+        timer t;
+        long current_time;
+        //println(t.read() + "^^^^^^^^"); 
+        //alt{
+        //    any = fake.read() : {println("----");}
+        //    t.timeout(t.read()+1000000) : { println("*******");} // unit is microsecond
+        //}
+        current_time = t.read();
+        t.timeout(current_time + random_num * 10);
+        //println(id + ": I am thinking DONE");
+        par {                // pick up forks
+            left.write(true);   
+            right.write(true);
+        }
+        t.timeout(current_time + random_num * 10);
+        println(id + ": I am eating DONE -------------------- " + id);
+        par {                // put down forks
+            left.write(true);
+            right.write(true);
+        }
+    }
+}
+
+// fork is a reserved word for now, so use Fork
+void Fork(int i, chan<boolean>.read left,
+	  chan<boolean>.read right) {
+    boolean any;
+    timer t;
+    while (true) {
+        alt {
+            any = left.read(): {   // right phil picks up
+                println(i + ": picked up from the right."); 
+                any = left.read();   // right phil puts down
+                println(i + ": put down from the right."); 
+            }
+            any = right.read(): {  // left phil picks up
+                println(i + ": picked up from the left."); 
+                any = right.read();  // left phil puts down
+                println(i + ": put down from the left.");      
+            }
+        }
+    }
+}
+
+void college() {    
+    // /* 5 philosophers */
+    
+    // chan<boolean> left0, left1, left2, left3, left4;
+    // chan<boolean> right0, right1, right2, right3, right4;
+
+    // par {
+    //     philosopher(0, left0.write, right0.write);
+    //     philosopher(1, left1.write, right1.write);
+    //     philosopher(2, left2.write, right2.write);
+    //     philosopher(3, left3.write, right3.write);
+    //     philosopher(4, left4.write, right4.write);
+        
+    //     Fork(0, left0.read, right1.read);
+    //     Fork(1, left1.read, right2.read);
+    //     Fork(2, left2.read, right3.read);
+    //     Fork(3, left3.read, right4.read);
+    //     Fork(4, left4.read, right0.read);
+    // }
+    
+
+        /* 2 philosophers */
+    
+    
+    chan<boolean> left0, left1, left2;
+    chan<boolean> right0, right1, right2;
+
+    par {
+        philosopher(0, left0.write, right0.write);
+        philosopher(1, left1.write, right1.write);
+        philosopher(2, left2.write, right2.write);
+        
+        Fork(0, left0.read, right1.read);
+        Fork(1, left1.read, right2.read);
+        Fork(2, left2.read, right0.read);
+    }
+    
+
+}
+
+public void main(string args[]) {
+  college();
+}

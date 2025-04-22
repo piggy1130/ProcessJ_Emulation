@@ -1,0 +1,118 @@
+import std.*;
+
+void securePhilosopher(int id, chan<boolean>.write left,
+		       chan<boolean>.write right,
+		       chan<boolean>.write down,
+		       chan<boolean>.write up) {
+    while (true) {
+	//println(id + ": I am thinking");
+	//println(id + ": I want to sit down.");
+ 	down.write(true);    // ask to sit down
+	par {                // pick up forks
+	    left.write(true);   
+	    right.write(true);
+	}
+	//println(id + ": I am eating");
+    println(": I am eating-------------------------------"+id);
+    //jl_sleep(100);
+
+	par {                // put down forks
+	    left.write(true);
+	    right.write(true);
+	}
+	//println(id + ": I want to get up.");
+	up.write(true);      // get up
+    }
+}
+
+// fork is a reserved word for now, so use Fork
+void Fork(int i, chan<boolean>.read left,
+	  chan<boolean>.read right) {
+    boolean any;
+    while (true) {
+	alt {
+	    any = left.read(): {   // right phil picks up
+            println(i + ": picked up from the right."); 
+            any = left.read();   // right phil puts down
+            //println(i + ": put down from the right."); 
+	    }
+	    any = right.read(): {  // left phil picks up
+            println(i + ": picked up from the left."); 
+            any = right.read();  // left phil puts down
+            //println(i + ": put down from the left.");      
+	    }
+	}
+    }
+}
+
+void security(chan<boolean>.read[] up, chan<boolean>.read[] down) {
+    // up.length does not cause an error! 
+    // const int maxSatDown = up.size - 1; // error: cannot read the array length
+    const int maxSatDown = 2;
+    int satDown = 0;
+    boolean any;
+    while (true) {
+      //println("Sat Down = " + satDown);
+      alt {
+	    //(satDown < maxSatDown) && any = down[4].read(): {satDown = satDown + 1; }
+        (satDown < maxSatDown) && any = down[0].read(): {satDown = satDown + 1; }
+	    (satDown < maxSatDown) && any = down[1].read(): {satDown = satDown + 1; }
+	    //(satDown < maxSatDown) && any = down[2].read(): {satDown = satDown + 1; }
+	    //(satDown < maxSatDown) && any = down[3].read(): {satDown = satDown + 1; }
+	    //(satDown < maxSatDown) && any = down[4].read(): {satDown = satDown + 1; }
+        //any = up[4].read():	satDown = satDown - 1;
+	    any = up[0].read(): satDown = satDown - 1;
+	    any = up[1].read():	satDown = satDown - 1;
+	    //any = up[2].read():	satDown = satDown - 1;
+	    //any = up[3].read():	satDown = satDown - 1;
+	    //any = up[4].read():	satDown = satDown - 1;
+	    }
+    }
+    
+}
+
+
+void secureCollege() {
+    // I handcoded this for you - I didn't check I got                                                                  
+    // it right, so you may wanna check that yourself ;-)                                                               
+    chan<boolean> left0, left1, left2, left3, left4;
+    chan<boolean> right0, right1, right2, right3, right4;
+    chan<boolean> down0, down1, down2, down3, down4;
+    chan<boolean> up0, up1, up2, up3, up4;
+
+    chan<boolean>.read[] ups = new chan<boolean>.read[5];
+    chan<boolean>.read[] downs = new chan<boolean>.read[5];
+    ups[0] = up0.read;
+    ups[1] = up1.read;
+    //ups[2] = up2.read;
+    //ups[3] = up3.read;
+    //ups[4] = up4.read;
+    downs[0] = down0.read;
+    downs[1] = down1.read;
+    //downs[2] = down2.read;
+    //downs[3] = down3.read;
+    //downs[4] = down4.read;
+
+    par {
+	    //securePhilosopher(i, left[i].write, right[i].write, down[i].write, up[i].write)
+        securePhilosopher(0, left0.write, right0.write, down0.write, up0.write);
+	    securePhilosopher(1, left1.write, right1.write, down1.write, up1.write);
+        //securePhilosopher(2, left2.write, right2.write, down2.write, up2.write);
+        //securePhilosopher(3, left3.write, right3.write, down3.write, up3.write);
+        //securePhilosopher(4, left4.write, right4.write, down4.write, up4.write);
+
+	    // fork(left[i].read, right[(i+1)%max].read);
+        Fork(0, left0.read, right1.read);
+        Fork(1, left1.read, right2.read);
+        //Fork(2, left2.read, right3.read);
+        //Fork(3, left3.read, right4.read);
+        //Fork(4, left4.read, right0.read);
+
+	    security(ups, downs);
+    }
+}
+
+public void main(string args[]) {
+    secureCollege(); 
+}
+

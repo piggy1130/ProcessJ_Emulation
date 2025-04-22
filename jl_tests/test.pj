@@ -1,0 +1,23 @@
+import std.*;
+
+public void main(string[] args){
+    while(true){
+        turnOnLed(5); // phil 1
+        turnOnLed(27); // phil 2
+        turnOnLed(26); // phil 3
+        turnOnLed(6); // fork 1
+        turnOnLed(16); // fork 2
+        turnOnLed(13); // fork 3
+        turnOnLed(20); // guard
+        jl_sleep(1000);
+
+        turnOffLed(5);
+        turnOffLed(27);
+        turnOffLed(26);
+        turnOffLed(6);
+        turnOffLed(16);
+        turnOffLed(13);
+        turnOffLed(20);
+        jl_sleep(1000);
+    }
+}

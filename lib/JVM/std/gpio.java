@@ -22,6 +22,7 @@ public class gpio {
     // Store created DigitalOutput instances by pin number
     private static Map<Integer, DigitalOutput> ledMap = new HashMap<>();
     private static Map<Integer, DigitalInput> buttonMap = new HashMap<>();
+    //private static Map<Integer, DigitalInput> switchMap = new HashMap<>();
 
     private static DigitalOutput getLedOutput(int pinNumber) {
         if (ledMap.containsKey(pinNumber)) {
@@ -54,6 +55,8 @@ public class gpio {
                 // keeps the pin HIGH when the button is not pressed
                 // change to LOW when button pressed
                 .pull(PullResistance.PULL_UP) // Use internal pull-up
+                // delay time use to filter out multiple, unintended signals from
+                // a mechanical switch or button
                 .debounce(3000L)               // Debounce time in microseconds
                 .provider("gpiod-digital-input")
                 .build();
@@ -62,7 +65,7 @@ public class gpio {
         buttonMap.put(pinNumber, button);  // Save it for reuse
         return button;
     }
-
+    
     // pinNumber is GPIO# - number after GPIO
     public static void turnOnLed(int pinNumber) {
         DigitalOutput led = getLedOutput(pinNumber);
@@ -86,8 +89,18 @@ public class gpio {
                 System.out.println("Task " + (taskRunning ? "STARTED" : "STOPPED"));
             } 
         });
+    }
 
-        
+    public static void listenToSwitch (int pinNumber){
+        DigitalInput sw = getButtonInput(pinNumber);
+        sw.addListener(event -> {
+            DigitalState switchState = event.state();
+            System.out.println("Switch state changed: " + switchState);
+        });
+        // if (switchState == DigitalState.LOW){
+        //     // switch is on
+        //     return true;
+        // }
     }
 
 

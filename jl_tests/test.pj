@@ -1,7 +1,11 @@
 import std.*;
 
 public void main(string[] args){
-    listenToButton(17);
+    println("hello test");
+    //listenToButton(17);
+    listenToButton(18);
+
+    //listenToSwitch(19);
 
     // while(true){
     //     if (taskRunning){

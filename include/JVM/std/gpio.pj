@@ -9,3 +9,4 @@ public native void turnOnLed(int pinNumber);
 public native void turnOffLed(int pinNumber);
 public native void shutdown();
 public native void listenToButton(int pinNumber);
+public native void listenToSwitch(int pinNumber);

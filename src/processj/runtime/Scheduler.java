@@ -86,8 +86,8 @@ public class Scheduler extends Thread {
 
         tq.kill();
 
-        System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
-        System.err.println("[Scheduler] Max RunQueue Size: " + maxrqsize);
+        //System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
+        //System.err.println("[Scheduler] Max RunQueue Size: " + maxrqsize);
 
         logExecutionTime();
     }
@@ -105,6 +105,6 @@ public class Scheduler extends Thread {
         long endTime = System.nanoTime();
         long elapsedTime = endTime - startTime;
         double seconds = (double) elapsedTime / 1000000000.0;
-        System.out.println("Total execution time: " + (seconds) + " secs");
+        //System.out.println("Total execution time: " + (seconds) + " secs");
     }
 }
